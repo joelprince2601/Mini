@@ -1,0 +1,16 @@
+# Register an event to monitor for the insertion of a USB drive
+Register-WmiEvent -Class Win32_VolumeChangeEvent -Action {
+    $event = $Event.SourceEventArgs.NewEvent
+    if ($event.EventType -eq 2) {
+        $driveLetter = $event.DriveName
+        $fileToRun = "D:\your_script.ps1"  # Replace with the path to your script on the USB drive
+        if (Test-Path $fileToRun -PathType Leaf) {
+            Start-Process powershell.exe -ArgumentList "-File `"$fileToRun`"" -WindowStyle Hidden
+        }
+    }
+} | Out-Null
+
+# Keep the script running
+while ($true) {
+    Start-Sleep -Seconds 5
+}
